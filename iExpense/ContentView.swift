@@ -13,33 +13,52 @@ struct ContentView: View {
     
     @State public var showingAddExpense = false
     
-    @State private var currencySymbol = Locale.current.currencyCode ?? "USD"
+    @State private var currencyCode = Locale.current.currencyCode ?? "USD"
         
     var body: some View {
+        
         NavigationView{
-            List{
-                ForEach(expenses.items){item in
-                    HStack{
-                        VStack(alignment: .leading){
-                            Text(item.name)
-                                .font(.headline)
-                            Text(item.type)
+            Form{
+                Section{
+                    List{
+                        ForEach(expenses.items){item in
+                            if(item.type == "Personal"){
+                                HStack{
+                                    Text(item.name)
+                                        .font(.headline)
+
+                                    Spacer()
+
+                                    Text(item.amount, format: .currency(code: currencyCode))
+                                        .foregroundColor(item.amount < 10 ? .green : item.amount < 100 ? .orange : .red)
+                                }
+                            }
                         }
-                        
-                        Spacer()
-                        
-                        VStack{
-                            Text(item.amount, format: .currency(code: currencySymbol))
-                                .foregroundColor(item.amount < 10 ? .green : item.amount < 100 ? .orange : .red)
-                        }
+                        .onDelete(perform: removeItems)
                     }
                 }
-                .onDelete(perform: removeItems)
-            }    
+                
+                Section{
+                    List{
+                        ForEach(expenses.items){item in
+                            if(item.type == "Business"){
+                                HStack{
+                                    Text(item.name)
+                                        .font(.headline)
+                                    Spacer()
+                                    
+                                    Text(item.amount, format: .currency(code: currencyCode))
+                                        .foregroundColor(item.amount < 10 ? .green : item.amount < 100 ? .orange : .red)
+                                }
+                            }
+                        }
+                        .onDelete(perform: removeItems)
+                    }
+                }
+            }
             .navigationTitle("iExpense")
             .toolbar{
                 Button{
-                    print(currencySymbol)
                     showingAddExpense = true
                 } label: {
                     Image(systemName: "plus")
